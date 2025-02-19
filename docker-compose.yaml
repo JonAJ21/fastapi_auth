@@ -1,0 +1,37 @@
+services:
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile
+    command: "uvicorn --factory application.api.v1.main:create_app --host=0.0.0.0 --reload --port 8000"
+    volumes:
+      - ./app:/app
+    ports:
+      - "${AUTH_SERVICE_PORT}:8000"
+    env_file: ".env"
+    restart: always
+    networks:
+      - backend
+  postgres-database:
+    container_name: postgres-database
+    image: postgres:17.2
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_DB_PORT}:5432
+    volumes:
+      - .postgres:/var/lib/postgresql/data
+    restart: always
+    networks:
+    - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres-database:
+    driver: local
