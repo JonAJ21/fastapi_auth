@@ -10,6 +10,9 @@ python = "^3.12"
 fastapi = "^0.115.8"
 uvicorn = {extras = ["all"], version = "^0.34.0"}
 pytest = "^8.3.4"
+sqlalchemy = "^2.0.38"
+pydantic-settings = "^2.7.1"
+passlib = "^1.7.4"
 
 
 [build-system]
