@@ -38,3 +38,4 @@ class UserHistoryCreateDTO(BaseModel):
     user_agent: str
     user_device_type: str
     success: bool
+    

@@ -10,11 +10,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
+from schemas.social import SocialNetworks
 from infrastructure.database.postgres import Base
-
-class SocialNetworks(Enum):
-    VK = 'vk'
-    YANDEX = 'yandex'
     
 class SocialAccount(Base):
     __tablename__ = "social_accounts"

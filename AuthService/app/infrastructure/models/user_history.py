@@ -17,7 +17,7 @@ class UserHistory(Base):
     __tablename__ = "user_history"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    user_uid = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     attempted = Column(DateTime(timezone=True), default=datetime.now(UTC))
     user_agent = Column(String(255))
     user_device_type = Column(String(255))
@@ -29,7 +29,7 @@ class UserHistory(Base):
     )
     
     def __init__(self, user_id, attempted, user_agent, user_device_type, success):
-        self.user_uid = user_id
+        self.user_id = user_id
         self.attempted = attempted
         self.user_agent = user_agent
         self.user_device_type = user_device_type
