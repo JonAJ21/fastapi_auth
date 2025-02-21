@@ -26,16 +26,15 @@ class UserUpdatePasswordDTO(BaseModel):
     new_password: str
     
 class UserHistoryDTO(IdentifiableMixin):
-    user_uid: UUID
+    user_id: UUID
     attempted: datetime
     user_agent: str
     user_device_type: str
     success: bool
     
 class UserHistoryCreateDTO(BaseModel):
-    user_uid: UUID
+    user_id: UUID
     attempted: datetime
     user_agent: str
     user_device_type: str
     success: bool
-    

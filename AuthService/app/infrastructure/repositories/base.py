@@ -8,9 +8,6 @@ ModelType = TypeVar('ModelType')
 CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
-
-
-
 @dataclass
 class BaseRepository(ABC):
     

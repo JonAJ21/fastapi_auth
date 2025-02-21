@@ -12,5 +12,10 @@ class Settings(BaseSettings):
         alias="ECHO",
         env="ECHO",
     )
+    access_expiratioin_seconds: int = Field(
+        1800,
+        alias="ACCESS_EXPIRATION_SECONDS",
+        env="ACCESS_EXPIRATION_SECONDS",
+    )
     
 settings = Settings()

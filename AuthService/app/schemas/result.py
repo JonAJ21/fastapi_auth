@@ -19,7 +19,7 @@ class Result:
         return Result(success=True, error=None)
     
     @staticmethod
-    def error(error: Error):
+    def failure(error: Error):
         return Result(success=False, error=error)
     
 
@@ -34,6 +34,6 @@ class GenericResult(Result, Generic[ModelType]):
         return GenericResult(success=True, error=None, response=value)
     
     @staticmethod
-    def error(error: Error):
+    def failure(error: Error):
         return GenericResult(success=False, error=error, response=None)
     
