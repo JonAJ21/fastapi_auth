@@ -7,19 +7,19 @@ from schemas.base import IdentifiableMixin
 
 class UserBase(IdentifiableMixin):
     login: str
-    email: EmailStr | None
+    email: EmailStr | None = None
 
 class UserDTO(UserBase):
-    roles: list[RoleBase] | None
+    roles: list[RoleBase] | None = None
     
 class UserCreateDTO(BaseModel):
     login: str
     password: str
-    email: EmailStr | None
+    email: EmailStr | None = None
 
 class UserUpdateDTO(BaseModel):
-    login: str | None
-    email: EmailStr | None
+    login: str | None = None
+    email: EmailStr | None = None
     
 class UserUpdatePasswordDTO(BaseModel):
     old_password: str

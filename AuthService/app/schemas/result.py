@@ -16,11 +16,11 @@ class Result:
     
     @staticmethod
     def success():
-        return Result(success=True, error=None)
+        return Result(is_success=True, error=None)
     
     @staticmethod
     def failure(error: Error):
-        return Result(success=False, error=error)
+        return Result(is_success=False, error=error)
     
 
 @dataclass
@@ -31,9 +31,9 @@ class GenericResult(Result, Generic[ModelType]):
     
     @staticmethod
     def success(value: ModelType):
-        return GenericResult(success=True, error=None, response=value)
+        return GenericResult(is_success=True, error=None, response=value)
     
     @staticmethod
     def failure(error: Error):
-        return GenericResult(success=False, error=error, response=None)
+        return GenericResult(is_success=False, error=error, response=None)
     
