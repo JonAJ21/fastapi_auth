@@ -4,7 +4,6 @@ from redis.asyncio import Redis
 
 from schemas.user import UserCreateDTO
 from logic.services.cache import RedisCacheService
-from infrastructure.repositories.postgre import PostgresRepository
 from infrastructure.models.user import User
 from infrastructure.repositories.cache import PostgresCacheRepository
 

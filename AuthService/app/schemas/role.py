@@ -14,7 +14,7 @@ class RoleCreateDTO(BaseModel):
     name: str
     description: str | None = None
     
-class RoleUpdateDTO(RoleBase):
+class RoleUpdateDTO(BaseModel):
     name: str
     description: str | None = None
     

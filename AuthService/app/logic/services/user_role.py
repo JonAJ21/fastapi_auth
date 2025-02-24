@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
-from AuthService.app.infrastructure.repositories.role import BaseRoleRepository
-from AuthService.app.logic.unit_of_work.base import BaseUnitOfWork
+from infrastructure.repositories.role import BaseRoleRepository
+from logic.unit_of_work.base import BaseUnitOfWork
 from infrastructure.repositories.user import BaseUserRepository
 from schemas.result import Error, Result
 

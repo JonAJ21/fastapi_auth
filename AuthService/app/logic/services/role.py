@@ -5,7 +5,7 @@ from typing import Any
 from infrastructure.repositories.role import BaseRoleRepository
 from logic.unit_of_work.base import BaseUnitOfWork
 from schemas.result import Error, GenericResult
-from schemas.role import RoleCreateDTO
+from schemas.role import RoleCreateDTO, RoleUpdateDTO
 from infrastructure.models.role import Role
 
 
@@ -61,18 +61,15 @@ class RoleService(BaseRoleService):
             )
         return GenericResult.success(role)
     
-    async def update_role(self, role_id, role):
-        return await super().update_role(role_id, role)
-    
     async def update_role(
-        self, role_id: Any, role: RoleCreateDTO
+        self, role_id: Any, role_dto: RoleUpdateDTO
     )-> GenericResult[Role]:
         role = await self._repository.get(id=role_id)
         response = GenericResult.failure(
             Error(error_code="ROLE_NOT_FOUND", reason="Role not found")
         )
         if role:
-            role.update(**role.model_dump())
+            role.update_role(**role_dto.model_dump())
             await self._uow.commit()
             response = GenericResult.success(role)
         return response
