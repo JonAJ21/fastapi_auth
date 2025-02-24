@@ -70,12 +70,12 @@ class UserService(BaseUserService):
     _repository: BaseUserRepository
     _uow: BaseUnitOfWork
     
-    async def get_user_history(self, *, user_id: Any, skip: int, limit: int) -> List[UserHistory]:
+    async def get_user_history(self, *, user_id: Any, skip: int = 0, limit: int = 100) -> List[UserHistory]:
         return await self._repository.get_user_history(
             user_id=user_id, skip=skip, limit=limit
         )
         
-    async def get_users(self, *, skip : int, limit: int) -> List[User]:
+    async def get_users(self, *, skip : int = 0, limit: int=100) -> List[User]:
         return await self._repository.gets(skip=skip, limit=limit)
     
     async def update_password(
@@ -145,6 +145,7 @@ class UserService(BaseUserService):
             user = await self._repository.insert(body=user_dto)
             user.add_social_account(
                 social_account=SocialAccount(
+                    user_id=user.id,
                     social_id=social.id,
                     social_name=social.social_name
                 )
@@ -152,10 +153,6 @@ class UserService(BaseUserService):
             await self._uow.commit()
             return GenericResult.success(user)
         return await self.get_user(user_id=social_user.user_id)
-            
-
-    
-    
     
     async def update_user(
         self, user_id: Any, user_dto: UserUpdateDTO
@@ -171,3 +168,7 @@ class UserService(BaseUserService):
         user.update_personal(**user_dto.model_dump())
         await self._uow.commit()
         return GenericResult.success(user)
+    
+    async def delete_user(self, *, user_id) -> None:
+       await self._repository.delete(id=user_id)
+       return await self._uow.commit()

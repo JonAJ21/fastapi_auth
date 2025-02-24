@@ -1,7 +1,9 @@
+from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from logic.unit_of_work.base import BaseUnitOfWork
 
+@dataclass
 class SqlAlchemyUnitOfWork(BaseUnitOfWork):
     _session: AsyncSession
     

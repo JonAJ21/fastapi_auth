@@ -10,8 +10,9 @@ class SocialNetworks(Enum):
 class SocialUser(BaseModel):
     id: str
     login: str
-    email: EmailStr | None
     social_name: SocialNetworks
+    email: EmailStr | None = None
+    tg_id: str | None = None
     
 class SocialCreateDTO(BaseModel):
     user_id: UUID

@@ -13,25 +13,80 @@ services:
     restart: always
     networks:
       - backend
-  # postgres-database:
-  #   container_name: postgres-database
-  #   image: postgres:17.2
-  #   environment:
-  #     POSTGRES_DB: ${POSTGRES_DB_NAME}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #   ports:
-  #     - ${POSTGRES_DB_PORT}:5432
-  #   volumes:
-  #     - .postgres:/var/lib/postgresql/data
-  #   restart: always
-  #   networks:
-  #   - backend
+    depends_on:
+      - postgres-database
+      - test-postgres-database 
+      - redis
+      - test-redis
+  postgres-database:
+    container_name: postgres-database
+    image: postgres:17.2
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB_NAME}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    ports:
+      - "${POSTGRES_DB_PORT}:5432"
+    volumes:
+      - .postgres:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - backend
+
+  test-postgres-database:
+    container_name: test-postgres-database
+    image: postgres:17.2
+    environment:
+      POSTGRES_DB: ${TEST_POSTGRES_DB_NAME}
+      POSTGRES_USER: ${TEST_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD}
+    ports:
+      - ${TEST_POSTGRES_DB_PORT}:5432
+    volumes:
+      - .test_postgres:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - backend
+
+  redis:
+    image: redis:alpine3.21
+    container_name: redis
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - .redis:/data
+    restart: always
+    networks:
+      - backend
+
+  test-redis:
+    image: redis:alpine3.21
+    container_name: test-redis
+    environment:
+      - REDIS_PASSWORD=${TEST_REDIS_PASSWORD}
+    command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    ports:
+      - "${TEST_REDIS_PORT}:6379"
+    volumes:
+      - .test-redis:/data
+    restart: always
+    networks:
+      - backend
+
 
 networks:
   backend:
     driver: bridge
 
 volumes:
+  test-postgres-database:
+    driver: local
   postgres-database:
+    driver: local
+  redis:
+    driver: local
+  test-redis:
     driver: local

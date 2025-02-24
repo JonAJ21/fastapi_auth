@@ -4,7 +4,6 @@ from pydantic import ValidationError
 import pytest
 from schemas.base import IdentifiableMixin
 
-
 def test_identifiable_mixin_creation():
     # Проверка корректного создания объекта
     uuid_value = "123e4567-e89b-12d3-a456-426614174000"

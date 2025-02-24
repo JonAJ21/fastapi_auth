@@ -18,6 +18,12 @@ class UserRole(Base):
         nullable=False
     )
     
+    # def to_dict(self):
+    #     return {
+    #         "user_id": self.user_id,
+    #         "role_id": self.role_id
+    #     }
+    
     __table_args__ = (
         UniqueConstraint("user_id", "role_id", name="user_role_unique"),
     )

@@ -20,6 +20,13 @@ class Role(Base):
         cascade="all, delete",
     )
     
+    # def to_dict(self):
+    #     return {
+    #         "id": self.id,
+    #         "name": self.name,
+    #         "description": self.description,
+    #         'users': [user.to_dict() for user in self.users]
+    #     }
     def __init__(self, name: str, description: str | None = None) -> None:
         self.name = name
         self.description = description

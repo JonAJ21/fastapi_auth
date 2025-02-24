@@ -11,16 +11,18 @@ def test_social_networks_enum():
 # Тесты для класса SocialUser
 def test_social_user_creation():
     # Проверка корректного создания объекта
-    user = SocialUser(id="123", login="user_login", email="user@example.com", social_name=SocialNetworks.VK)
+    user = SocialUser(id="123", login="user_login", email="user@example.com", tg_id="123", social_name=SocialNetworks.VK)
     assert user.id == "123"
     assert user.login == "user_login"
     assert user.email == "user@example.com"
+    assert user.tg_id == "123"
     assert user.social_name == SocialNetworks.VK
 
-def test_social_user_optional_email():
-    # Проверка, что email может быть None
-    user = SocialUser(id="123", login="user_login", email=None, social_name=SocialNetworks.YANDEX)
+def test_social_user_optional_email_tg():
+    # Проверка, что email, tg_idможет быть None
+    user = SocialUser(id="123", login="user_login", email=None, tg_id=None, social_name=SocialNetworks.YANDEX)
     assert user.email is None
+    assert user.tg_id is None
 
 def test_social_user_invalid_email():
     # Проверка валидации email

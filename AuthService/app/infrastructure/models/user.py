@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from uuid import uuid4
 from typing import List, Self
-from passlib.hash import pbkdf2_sha256
+import bcrypt
 from pydantic import EmailStr
 
 from sqlalchemy import (
@@ -21,14 +21,15 @@ from infrastructure.models.role import Role
 class User(Base):
     __tablename__ = 'users'
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     login = Column(String(255), nullable=False, unique=True)
-    password_hash = Column(String(255), nullable=False)
+    password = Column(String(255), nullable=False)
     email = Column(String(255), nullable=True)
+    tg_id = Column(String(255), nullable=True)
     roles: Mapped[List['Role']] = relationship(
         'Role',
         secondary=UserRole.__tablename__,
-        cascade='all, delete-orphan',
+        cascade='all, delete',
         back_populates='users'
     )
     history: Mapped[List['UserHistory']] = relationship(
@@ -53,23 +54,39 @@ class User(Base):
         self,
         login: str,
         password: str, 
+        tg_id: str | None = None,
         email: EmailStr | None = None
     ) -> None:
+        self.id = uuid4()
         self.login = login
-        self.password_hash = pbkdf2_sha256.hash(password)
+        self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         self.email = email
+        self.tg_id = tg_id
         self.social_accounts = []
         
     def __repr__(self) -> str:
         return f"<User {self.login}>"
     
     def check_password(self, password: str) -> bool:
-        return pbkdf2_sha256.verify(password, self.password_hash)
+        return bcrypt.checkpw(password.encode(), self.password.encode())
     
     def change_password(self, old_password: str, new_password) -> bool:
         if not self.check_password(old_password):
             return False
-        self.password_hash = pbkdf2_sha256.hash(new_password)
+        self.password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+    
+    def update_personal(
+        self,
+        login: str | None = None,
+        email: EmailStr | None = None,
+        tg_id: str | None = None,
+    ) -> Self:
+        if login != "" and login is not None:
+            self.login = login
+        if email is not None:
+            self.email = email
+        if tg_id != "" and tg_id is not None:
+            self.tg_id = tg_id
     
     def update_login(self, login: str) -> Self:
         self.login = login if login != "" else self.login
@@ -77,6 +94,9 @@ class User(Base):
     
     def update_email(self, email: EmailStr) -> Self:
         self.email = email
+    
+    def update_tg_id(self, tg_id: str) -> Self:
+        self.tg_id = tg_id
     
     def has_role(self, role_name: str) -> bool:
         for role in self.roles:

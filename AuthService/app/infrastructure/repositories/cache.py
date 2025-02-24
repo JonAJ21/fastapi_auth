@@ -7,26 +7,25 @@ from infrastructure.repositories.base import CreateSchemaType, ModelType
 
 
 @dataclass 
-class CacheRepository(
+class PostgresCacheRepository(
     PostgresRepository[ModelType, CreateSchemaType],
     Generic[ModelType, CreateSchemaType],
 ):
-    _repository: PostgresRepository[ModelType, CreateSchemaType]
-    _model: Type[ModelType]
+    
     _cache_service: BaseCacheService
     
     async def gets(self, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
-        return await self._repository.get(skip=skip, limit=limit)
+        return await super().gets(skip=skip, limit=limit)
     
     async def get(self, *, id: Any) -> ModelType | None:
         key = f"{self._model.__name__}_{id}"
         entity = await self._cache_service.get(key=key)
         if not entity:
-            entity = await self._repository.get(id=id)
+            entity = await super().get(id=id)
         return entity
     
     async def insert(self, *, body: CreateSchemaType) -> ModelType:
-        return await self._repository.insert(body=body)
+        return await super().insert(body=body)
     
     async def delete(self, *, id: Any) -> None:
-        await self._repository.delete(id=id)
+        await super().delete(id=id)

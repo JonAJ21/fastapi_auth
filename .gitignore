@@ -3,3 +3,7 @@
 poetry.lock
 .pytest_cache
 __pycache__
+.postgres
+.test_postgres
+.redis
+.test-redis
