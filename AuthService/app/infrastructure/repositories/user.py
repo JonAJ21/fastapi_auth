@@ -115,6 +115,12 @@ class PostgresUserRepository(PostgresRepository[User, UserCreateDTO], BaseUserRe
         user.add_social_account(social)
         return GenericResult.success(social)
     
+    def __hash__(self):
+        return hash((self._model))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+    
 @dataclass
 class PostgresCacheUserRepository(
     PostgresCacheRepository[User, UserCreateDTO], PostgresUserRepository
@@ -157,3 +163,9 @@ class PostgresCacheUserRepository(
         return await super().insert_user_social(
             user_id=user_id, data=data
         )
+        
+    def __hash__(self):
+        return hash((self._model, self._cache_service))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)

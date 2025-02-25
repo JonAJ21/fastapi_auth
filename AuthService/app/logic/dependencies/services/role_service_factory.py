@@ -19,11 +19,11 @@ from logic.unit_of_work.sqlalchemy import SqlAlchemyUnitOfWork
 def create_role_service(
     session: AsyncSession = Depends(get_session), redis: Redis = Depends(get_redis)
 ) -> BaseRoleService:
-    cache_service = RedisCacheService(client=redis, model=Role)
+    cache_service = RedisCacheService(_client=redis, _model=Role)
     cached_repository = PostgresCacheRoleRepository(
         _session=session,
         _model=Role,
         _cache_service=cache_service
     )
-    unit_of_work = SqlAlchemyUnitOfWork(session=session)
-    return RoleService(repository=cached_repository, uow=unit_of_work)
+    unit_of_work = SqlAlchemyUnitOfWork(_session=session)
+    return RoleService(_repository=cached_repository, _uow=unit_of_work)

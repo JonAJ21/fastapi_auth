@@ -4,6 +4,9 @@ from typing import Any, List
 
 from faker import Faker
 
+from schemas.events import UserRegisteredEventDTO
+from infrastructure.kafka.sender import KafkaSender, get_producer
+from logic.dependencies.services.sender_factory import create_sender
 from infrastructure.models.social_account import SocialAccount
 from logic.unit_of_work.base import BaseUnitOfWork
 from infrastructure.repositories.user import BaseUserRepository
@@ -103,6 +106,16 @@ class UserService(BaseUserService):
             user = await self._repository.insert(body=user_dto)
             await self._uow.commit()
             response = GenericResult.success(user)
+            sender : KafkaSender = create_sender(get_producer())
+            await sender.send_on_register(
+                UserRegisteredEventDTO(
+                    user_login=user_dto.login,
+                    user_email=user_dto.email)
+            )
+            
+            
+            
+            
         return response
     
     async def insert_user_login(
@@ -172,3 +185,9 @@ class UserService(BaseUserService):
     async def delete_user(self, *, user_id) -> None:
        await self._repository.delete(id=user_id)
        return await self._uow.commit()
+   
+    def __hash__(self):
+        return hash((self._repository, self._uow))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)

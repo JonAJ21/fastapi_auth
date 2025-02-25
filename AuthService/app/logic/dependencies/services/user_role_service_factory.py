@@ -33,7 +33,7 @@ def create_user_role_service(
         _model=Role,
         _cache_service=role_cache_service
     )
-    unit_of_work = SqlAlchemyUnitOfWork(session=session)
+    unit_of_work = SqlAlchemyUnitOfWork(_session=session)
     return UserRoleService(
         _user_repository=cached_user_repository,
         _role_repository=cached_role_repository,

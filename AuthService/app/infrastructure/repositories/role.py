@@ -27,6 +27,11 @@ class PostgresRoleRepository(PostgresRepository[Role, RoleCreateDTO], BaseRoleRe
         statement = select(self._model).where(self._model.name == name)
         return (await self._session.execute(statement)).scalar_one_or_none()
     
+    def __hash__(self):
+        return hash((self._model))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)
 
 @dataclass
 class PostgresCacheRoleRepository(
@@ -43,3 +48,8 @@ class PostgresCacheRoleRepository(
             entity = await super().get_role_by_name(name=name)
         return entity
     
+    def __hash__(self):
+        return hash((self._model, self._cache_service))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)

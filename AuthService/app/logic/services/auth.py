@@ -5,6 +5,7 @@ from typing import Any
 from datetime import UTC, datetime
 from time import time
 
+import async_fastapi_jwt_auth
 from async_fastapi_jwt_auth import AuthJWT
 from async_fastapi_jwt_auth.exceptions import JWTDecodeError, MissingTokenError
 from fastapi import HTTPException, status
@@ -134,6 +135,17 @@ class AuthService(BaseAuthService):
                     reason="Wrong login or password"
                 )
             )
+        user_history = UserHistoryCreateDTO(
+            user_id=user.id,
+            attempted=datetime.now(UTC),
+            user_agent="oauth2",
+            user_device_type="web",
+            success=True
+        )
+        await self._user_service.insert_user_login(
+            user_id=user.id, history_row=user_history
+        )    
+        
         tokens = await self._generate_token(user_id=str(user.id))
         await self._auth_jwt_service.set_access_cookies(tokens.access_token)
         await self._auth_jwt_service.set_refresh_cookies(tokens.refresh_token)
@@ -142,7 +154,9 @@ class AuthService(BaseAuthService):
     async def logout(self) -> None:
         await self.require_auth()
         access_jti = (await self._auth_jwt_service.get_raw_jwt())["jti"]
-        await self._auth_jwt_service.unset_jwt_cookies()
+        # await self._auth_jwt_service.unset_jwt_cookies()
+        await self._auth_jwt_service.unset_access_cookies()
+        await self._auth_jwt_service.unset_refresh_cookies()
         token_jti = TokenJTI(
             access_token_jti=access_jti,
             refresh_token_jti=None
@@ -182,9 +196,17 @@ class AuthService(BaseAuthService):
     async def optional_auth(self):
         return await self._auth_jwt_service.jwt_optional()
     
+    async def get_user(self) -> User | None:
+        await self.require_auth()
+        user_subject = await self._auth_jwt_service.get_jwt_subject()
+        user: GenericResult[User] = await self._user_service.get_user(
+            user_id=user_subject
+        )
+        return user.response
+    
     async def get_auth_user(self, access_token: str) -> User | None:
         decoded = await self._decode_token(access_token)
-        if decoded["exp"] < time():
+        if decoded["exp"] <= time():
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Token is expired"
             )

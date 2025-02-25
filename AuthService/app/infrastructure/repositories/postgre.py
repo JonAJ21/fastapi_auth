@@ -33,3 +33,9 @@ class PostgresRepository(BaseRepository, Generic[ModelType, CreateSchemaType]):
     async def delete(self, *, id: Any) -> None:
         statement = delete(self._model).where(self._model.id == id)
         await self._session.execute(statement)
+        
+    def __hash__(self):
+        return hash((self._session, self._model))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)

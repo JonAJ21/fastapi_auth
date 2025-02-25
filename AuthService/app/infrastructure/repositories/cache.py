@@ -29,3 +29,9 @@ class PostgresCacheRepository(
     
     async def delete(self, *, id: Any) -> None:
         await super().delete(id=id)
+        
+    def __hash__(self):
+        return hash((self._cache_service))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)

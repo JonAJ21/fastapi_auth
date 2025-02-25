@@ -22,6 +22,8 @@ class TokenStorage(ABC):
     async def check_expiration(self, *args, **kwargs):
         ...
         
+        
+        
 @dataclass
 class RedisTokenStorage(TokenStorage):
     _client: Redis
@@ -40,10 +42,16 @@ class RedisTokenStorage(TokenStorage):
                     time=settings.refresh_expiratioin_seconds,
                     value=str(True)
                 )
-        await self._client.execute(_store_token)
+        await self._client.transaction(_store_token)
         
     async def get_token(self, *, key: str) -> bool:
         return await self._client.get(key)
     
     async def check_expiration(self, *, jti: str) -> bool:
         return await self.get_token(key=jti) == True
+    
+    def __hash__(self):
+        return hash(self._client)
+    
+    def __eq__(self, other):
+        return hash(self) == hash(other)

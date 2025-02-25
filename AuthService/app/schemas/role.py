@@ -18,7 +18,7 @@ class RoleUpdateDTO(BaseModel):
     name: str
     description: str | None = None
     
-class Roles(Enum):
+class Roles:
     SUPER_ADMIN = 'super_admin'
     ADMIN = 'admin'
     USER = 'user'

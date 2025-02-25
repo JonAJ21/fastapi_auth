@@ -15,7 +15,7 @@ def create_auth_service(
     user_service: BaseUserService = Depends(),
 ) -> BaseAuthService:
     return AuthService(
-        auth_jwt_service=auth_jwt,
-        token_storage=token_storage,
-        user_service=user_service,
+        _auth_jwt_service=auth_jwt,
+        _token_storage=token_storage,
+        _user_service=user_service,
     )

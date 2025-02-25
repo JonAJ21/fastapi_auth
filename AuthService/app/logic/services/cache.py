@@ -40,3 +40,9 @@ class RedisCacheService(BaseCacheService, Generic[ModelType, CreateSchemaType]):
     async def delete(self, *, key: str) -> None:
         if await self._client.exists(key):
             await self._client.delete(key)
+            
+    def __hash__(self):
+        return hash((self._client, self._model))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)

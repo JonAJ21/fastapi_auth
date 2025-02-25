@@ -19,3 +19,5 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-root --no-interaction --no-ansi
 
 COPY /app/* /app/
+
+CMD ["python", "/bot/main.py"]

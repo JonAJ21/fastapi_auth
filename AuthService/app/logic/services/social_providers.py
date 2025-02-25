@@ -80,7 +80,21 @@ class VK(SocialNetworkProvider):
     userinfo_url = settings.yandex_userinfo_url
     client_secret = settings.yandex_client_secret
     client_id = settings.yandex_client_id
-    
+
+
+async def get_providers() -> dict[SocialNetworks, OAuth2Session]:
+    yandex = OAuth2Session(
+        settings.yandex_client_id, redirect_uri=settings.social_auth_redirect_url
+    )
+    vk = OAuth2Session(
+        settings.vk_client_id, redirect_uri=settings.social_auth_redirect_url
+    )
+    return {
+        SocialNetworks.YANDEX: yandex,
+        SocialNetworks.VK: vk
+    }
+
+
 async def get_provider(provider_name: SocialNetworks) -> SocialNetworkProvider:
     providers = {
         SocialNetworks.YANDEX: Yandex,

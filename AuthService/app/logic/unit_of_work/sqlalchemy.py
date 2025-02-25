@@ -9,3 +9,9 @@ class SqlAlchemyUnitOfWork(BaseUnitOfWork):
     
     async def commit(self, *args, **kwargs) -> None:
         await self._session.commit()
+        
+    def __hash__(self):
+        return hash((self._session))
+        
+    def __eq__(self, other):
+        return hash(self) == hash(other)
