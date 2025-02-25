@@ -4,11 +4,6 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # postgres_connection: PostgresDsn = Field(
-    #     "postgresql+asyncpg://postgres:postgres@localhost:5432/postgres",
-    #     alias="POSTGRES_CONNECTION",
-    #     json_schema_extra={"env": "POSTGRES_CONNECTION"},
-    # )
     kafka_url: str = Field(
         "localhost:9092",
         alias="KAFKA_URL",

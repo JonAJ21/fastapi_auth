@@ -1,9 +1,12 @@
+import asyncio
 import json
 import logging
 from aiokafka import AIOKafkaConsumer
 from telegram import Bot
 from telegram.error import TelegramError
-from settings.config import settings
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from config import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -19,6 +22,7 @@ async def consume_messages():
     bot = Bot(
         token=settings.tg_token,
     )
+    
     await consumer.start()
     logger.info("Kafka consumer started")
     try:
@@ -26,7 +30,7 @@ async def consume_messages():
             try:
                 message = json.loads(msg.value.decode('utf-8'))
                 logger.info(f"Received message from Kafka: {message}")
-                formatted_message = message
+                formatted_message = f"Пользователь {message['user_login']} прошёл регистрацию"
                 await bot.send_message(
                     chat_id=settings.chat_id,
                     text=formatted_message
@@ -41,9 +45,18 @@ async def consume_messages():
     finally:
         await consumer.stop()
         logger.info("Kafka consumer stopped")
+
+
         
 async def main():
-    await consume_messages()
+    while True:
+        try:
+            await consume_messages()
+        except Exception as e:
+            logger.error(f"Error in main loop: {e}")
+            await asyncio.sleep(5) 
+
+
     
 if __name__ == "__main__":
     asyncio.run(main())

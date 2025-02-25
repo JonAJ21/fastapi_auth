@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List
 
+from aiokafka import AIOKafkaProducer
 from faker import Faker
 
+from settings.config import settings
 from schemas.events import UserRegisteredEventDTO
-from infrastructure.kafka.sender import KafkaSender, get_producer
-from logic.dependencies.services.sender_factory import create_sender
 from infrastructure.models.social_account import SocialAccount
 from logic.unit_of_work.base import BaseUnitOfWork
 from infrastructure.repositories.user import BaseUserRepository
@@ -106,15 +106,23 @@ class UserService(BaseUserService):
             user = await self._repository.insert(body=user_dto)
             await self._uow.commit()
             response = GenericResult.success(user)
-            sender : KafkaSender = create_sender(get_producer())
-            await sender.send_on_register(
-                UserRegisteredEventDTO(
-                    user_login=user_dto.login,
-                    user_email=user_dto.email)
+            
+            producer = AIOKafkaProducer(
+                bootstrap_servers=settings.kafka_url,
             )
-            
-            
-            
+            event = UserRegisteredEventDTO(
+                    user_login=user_dto.login,
+                    user_email=user_dto.email,
+                    event="User registered"
+                )
+            await producer.start()
+            try:
+                await producer.send(
+                    'user.registered', 
+                    value=event.model_dump_json().encode('utf-8')
+                )
+            finally:
+                await producer.stop()
             
         return response
     

@@ -27,8 +27,6 @@ def setup_dependencies(app: FastAPI, mapper: dict[Any, Callable] | None = None) 
         dependencies_container[TokenStorage] = create_token_storage
         dependencies_container[RoleService] = create_role_service
         dependencies_container[BaseAuthService] = create_auth_service
-        dependencies_container[BaseSender] = create_sender
-        
         
         mapper = dependencies_container
     for interface, dependency in mapper.items():

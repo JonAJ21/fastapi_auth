@@ -4,6 +4,7 @@ LOGS = docker logs
 ENV = --env-file .env
 DOCKER_COMPOSE_FILE = docker-compose.yaml
 AUTH_CONTAINER = auth-service
+BOT_CONTAINER = bot
 
 .PHONY: app
 app:
@@ -24,3 +25,11 @@ auth-shell:
 .PHONY: auth-logs
 auth-logs:
 	${LOGS} ${AUTH_CONTAINER} -f
+
+.PHONY: bot-shell
+bot-shell:
+	${EXEC} ${BOT_CONTAINER} bash
+
+.PHONY: bot-logs
+bot-logs:
+	${LOGS} ${BOT_CONTAINER} -f

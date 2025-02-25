@@ -18,6 +18,25 @@ services:
       - test-postgres-database 
       - redis
       - test-redis
+
+  bot:
+    container_name: bot
+    build:
+      context: ./TelegramBot
+      dockerfile: Dockerfile
+    volumes:
+      - ./TelegramBot/app:/app
+    command: "python bot/main.py"
+    env_file: ".env"
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - zookeeper
+      - kafka
+      - kafka-ui
+      - auth-service
+    
   postgres-database:
     container_name: postgres-database
     image: postgres:17.2
@@ -78,14 +97,18 @@ services:
 
 
   zookeeper:
+    container_name: zookeeper
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 22181:2181
+    networks:
+      - backend
 
   kafka:
+    container_name: kafka
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
@@ -100,8 +123,11 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck: 
       test: nc -z localhost 29092  
+    networks:
+      - backend
 
   kafka-ui:
+    container_name: kafka-ui
     image: provectuslabs/kafka-ui
     ports:
       - 8090:8080
@@ -110,7 +136,9 @@ services:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092
       - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
-      
+    networks:
+      - backend
+
 networks:
   backend:
     driver: bridge

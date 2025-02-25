@@ -20,4 +20,4 @@ RUN poetry install --no-root --no-interaction --no-ansi
 
 COPY /app/* /app/
 
-CMD ["python", "/bot/main.py"]
+CMD ["python", "app/bot/main.py"]
