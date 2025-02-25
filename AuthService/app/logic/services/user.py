@@ -172,6 +172,25 @@ class UserService(BaseUserService):
                 )
             )
             await self._uow.commit()
+            
+            
+            producer = AIOKafkaProducer(
+                bootstrap_servers=settings.kafka_url,
+            )
+            event = UserRegisteredEventDTO(
+                    user_login=user_dto.login,
+                    user_email=user_dto.email,
+                    event="User registered"
+                )
+            await producer.start()
+            try:
+                await producer.send(
+                    'user.registered', 
+                    value=event.model_dump_json().encode('utf-8')
+                )
+            finally:
+                await producer.stop()
+            
             return GenericResult.success(user)
         return await self.get_user(user_id=social_user.user_id)
     

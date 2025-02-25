@@ -3,8 +3,7 @@ from typing import Any, Callable
 from fastapi import Depends, FastAPI
 from fastapi_limiter.depends import RateLimiter
 
-from infrastructure.kafka.sender import BaseSender
-from logic.dependencies.services.sender_factory import create_sender
+from async_fastapi_jwt_auth import AuthJWT
 from infrastructure.storages.token import TokenStorage
 from logic.dependencies.services.auth_service_factory import create_auth_service
 from logic.dependencies.services.role_service_factory import create_role_service

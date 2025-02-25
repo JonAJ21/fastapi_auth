@@ -73,6 +73,16 @@ def create_app() -> FastAPI:
         description='Auth service',
         lifespan=lifespan,
     )
+    
+    # Configure CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allows all origins (replace with specific domains for security)
+        allow_credentials=True,
+        allow_methods=["*"],  # Allows all HTTP methods
+        allow_headers=["*"],  # Allows all headers
+    )
+
 
     app.include_router(accounts_router, prefix='/accounts')
     app.include_router(socials_router, prefix='/socials')

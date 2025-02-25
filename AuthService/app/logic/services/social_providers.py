@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from async_oauthlib import OAuth2Session
 from httpx import AsyncClient, HTTPStatusError
 from fastapi import HTTPException, status
@@ -11,14 +9,15 @@ from schemas.social import SocialNetworks, SocialUser
 from settings.config import settings
 
 
-@dataclass
 class SocialNetworkProvider:
-    social_name: SocialNetworks | None = SocialNetworks
-    session: OAuth2Session | None = None
-    auth_token_url: str | None = None
-    user_info_url: str | None = None
-    client_secret: str | None = None
-    client_id: str | None = None
+    social_name = SocialNetworks
+    auth_token_url: str 
+    user_info_url: str 
+    client_secret: str 
+    client_id: str 
+    
+    def __init__(self):
+        self.session = None
     
     async def init_session(self):
         self.session = OAuth2Session(
@@ -42,11 +41,12 @@ class SocialNetworkProvider:
         try:
             async with AsyncClient() as client:
                 token_response = await client.post(self.auth_token_url, data=data)
+                
                 token_response.raise_for_status()
                 token =  token_response.json()["access_token"]
                 
                 headers = {"Authorization": f"Bearer {token}"}
-                user_info_response = await client.get(self.user_info_url, headers=headers)
+                user_info_response = await client.get(self.userinfo_url, headers=headers)
                 user_info_response.raise_for_status()
                 return user_info_response.json()
         except HTTPStatusError:
@@ -95,15 +95,28 @@ async def get_providers() -> dict[SocialNetworks, OAuth2Session]:
     }
 
 
+# async def get_provider(provider_name: SocialNetworks) -> SocialNetworkProvider:
+#     providers = {
+#         SocialNetworks.YANDEX: Yandex,
+#         SocialNetworks.VK: VK
+#     }
+#     provider_class = providers.get(provider_name)
+#     if not provider_class:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Unsupported social network"
+#         )
+#     return await provider_class.create()
+
 async def get_provider(provider_name: SocialNetworks) -> SocialNetworkProvider:
     providers = {
         SocialNetworks.YANDEX: Yandex,
-        SocialNetworks.VK: VK
+        SocialNetworks.VK: VK,
     }
     provider_class = providers.get(provider_name)
     if not provider_class:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Unsupported social network"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported social network"
         )
+
     return await provider_class.create()

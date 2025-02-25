@@ -104,7 +104,7 @@ async def get_user(
 ) -> User:
     user: GenericResult[User] = await user_service.get_user(user_id=user_id)
     if not user.is_success:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=user.error.reason)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="400")
     return user.response
 
 
@@ -127,7 +127,7 @@ async def update_user_profile(
     )
     if not user_result.is_success:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=user.error.reason
+            status_code=status.HTTP_400_BAD_REQUEST, detail="400"
         )
     return user_result.response
 
@@ -192,7 +192,7 @@ async def get_user_data(
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
         return user
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.message)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="400")
 
 @router.delete(
     "/profile",
